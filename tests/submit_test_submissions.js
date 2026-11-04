@@ -19,7 +19,7 @@
  */
 
 const { execFileSync } = require('child_process');
-const { getAllSurveyPairs, SAATY_SCALE_OPTIONS, SURVEY_STEPS } = require('../js/criteria.js');
+const { getAllSurveyPairs, SAATY_SCALE_OPTIONS, SURVEY_STEPS } = require('../src/js/criteria.js');
 
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 const ACCESS_KEY = "b7fcd54a-0764-49b7-ab97-958c10fdb7f5";

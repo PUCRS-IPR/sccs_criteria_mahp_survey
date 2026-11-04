@@ -14,6 +14,7 @@
   <!-- Custom Styles (100% free of inline styles in HTML) -->
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
   <!-- Hero / Main Header -->
@@ -63,7 +64,7 @@
     <div class="sticky-progress-bar shadow-sm">
       <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-primary px-2 py-1" id="currentStepBadge">Step 1 of 9</span>
+          <span class="badge bg-primary px-2 py-1" id="currentStepBadge">Step 1 of 8</span>
           <span class="small fw-semibold text-secondary" id="currentStepName">Context & Identification</span>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -72,7 +73,7 @@
             <span id="saveStatusText">Saved locally</span>
           </span>
           <span class="small fw-bold text-primary" id="ahpProgressText">
-            0 of 45 comparisons completed (0%)
+            0 of 44 comparisons completed (0%)
           </span>
         </div>
       </div>
@@ -133,7 +134,7 @@
                   This scientific research aims to <strong>Select and Prioritize Sites for SCCS in Ultra-Deepwater Salt Domes</strong>, using the multi-criteria <strong>Fuzzy-AHP (Analytic Hierarchy Process)</strong> method.
                 </p>
                 <div class="alert alert-primary border-0 py-2 px-3 small mb-3">
-                  <i class="bi bi-lightbulb me-1"></i> The hierarchical structure comprises <strong>6 main criteria</strong> and <strong>22 specific sub-criteria</strong>, according to the official technical diagram.
+                  <i class="bi bi-lightbulb me-1"></i> The hierarchical structure comprises <strong>5 main criteria</strong> and <strong>21 specific sub-criteria</strong>, according to the official technical diagram.
                 </div>
                 
                 <h6 class="fw-bold text-dark mb-2">
@@ -256,7 +257,7 @@
       </section>
 
       <!-- ====================================================================
-           STEP 2: Main Criteria (15 Comparisons)
+           STEP 2: Main Criteria (10 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_2" data-step-index="2">
         <div class="step-header">
@@ -264,12 +265,11 @@
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
               <h4 class="step-title">Step 2: Main Criteria</h4>
-              <p class="step-subtitle">Evaluate the pairwise relative importance among the 6 fundamental main criteria</p>
+              <p class="step-subtitle">Evaluate the pairwise relative importance among the 5 fundamental main criteria</p>
             </div>
-            <span class="badge bg-primary px-3 py-2">15-Comparison Matrix (5 rows &times; 3 columns)</span>
+            <span class="badge bg-primary px-3 py-2">10-Comparison Matrix (5 criteria)</span>
           </div>
         </div>
-
 
         <!-- Compact Card Matrix filled via JS -->
         <div class="comparison-matrix" id="matrixContainer_step_2"></div>
@@ -280,7 +280,7 @@
             <i class="bi bi-arrow-left me-2"></i> Back: Expert Details
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_2">
-            0 of 15 answered
+            0 of 10 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="3">
             Next: Geological Formation Sub-criteria (A) <i class="bi bi-arrow-right ms-2"></i>
@@ -289,7 +289,7 @@
       </section>
 
       <!-- ====================================================================
-           STEP 3: Sub-criteria for A - Geological Formation (6 Comparisons)
+           STEP 3: Sub-criteria for A - Geological Formation (10 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_3" data-step-index="3">
         <div class="step-header">
@@ -297,12 +297,11 @@
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
               <h4 class="step-title">Step 3: Sub-criteria for <span class="text-crit-a">A. Geological Formation</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 4 sub-criteria of the host evaporite formation</p>
+              <p class="step-subtitle">Compare the relevance among the 5 sub-criteria of the host evaporite formation</p>
             </div>
-            <span class="badge badge-criteria-a px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+            <span class="badge badge-criteria-a px-3 py-2">10-Comparison Matrix (5 sub-criteria)</span>
           </div>
         </div>
-
 
         <div class="comparison-matrix" id="matrixContainer_step_3"></div>
 
@@ -311,29 +310,28 @@
             <i class="bi bi-arrow-left me-2"></i> Back: Main Criteria
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_3">
-            0 of 6 answered
+            0 of 10 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="4">
-            Next: Mineralogy and Geochemistry Sub-criteria (B) <i class="bi bi-arrow-right ms-2"></i>
+            Next: Formation Geomechanics Sub-criteria (B) <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
       </section>
 
       <!-- ====================================================================
-           STEP 4: Sub-criteria for B - Mineralogy and Geochemistry (3 Comparisons)
+           STEP 4: Sub-criteria for B - Formation Geomechanics (6 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_4" data-step-index="4">
         <div class="step-header">
           <div class="step-number-badge step-badge-b">4</div>
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
-              <h4 class="step-title">Step 4: Sub-criteria for <span class="text-crit-b">B. Mineralogy and Geochemistry</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 3 mineralogical and geochemical sub-criteria</p>
+              <h4 class="step-title">Step 4: Sub-criteria for <span class="text-crit-b">B. Formation Geomechanics</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 geomechanical and stability sub-criteria</p>
             </div>
-            <span class="badge badge-criteria-b px-3 py-2">3-Comparison Matrix (1 row &times; 3 columns)</span>
+            <span class="badge badge-criteria-b px-3 py-2">6-Comparison Matrix (4 sub-criteria)</span>
           </div>
         </div>
-
 
         <div class="comparison-matrix" id="matrixContainer_step_4"></div>
 
@@ -342,146 +340,112 @@
             <i class="bi bi-arrow-left me-2"></i> Back: Geological Formation Sub-criteria (A)
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_4">
-            0 of 3 answered
+            0 of 6 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="5">
-            Next: Formation Geomechanics Sub-criteria (C) <i class="bi bi-arrow-right ms-2"></i>
+            Next: Lithological Heterogeneity Sub-criteria (C) <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
       </section>
 
       <!-- ====================================================================
-           STEP 5: Sub-criteria for C - Formation Geomechanics (6 Comparisons)
+           STEP 5: Sub-criteria for C - Lithological Heterogeneity Characteristics (6 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_5" data-step-index="5">
         <div class="step-header">
           <div class="step-number-badge step-badge-c">5</div>
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
-              <h4 class="step-title">Step 5: Sub-criteria for <span class="text-crit-c">C. Formation Geomechanics</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 4 stability and geomechanical stress sub-criteria</p>
+              <h4 class="step-title">Step 5: Sub-criteria for <span class="text-crit-c">C. Lithological Heterogeneity Characteristics</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 lithological heterogeneity sub-criteria</p>
             </div>
-            <span class="badge badge-criteria-c px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+            <span class="badge badge-criteria-c px-3 py-2">6-Comparison Matrix (4 sub-criteria)</span>
           </div>
         </div>
-
 
         <div class="comparison-matrix" id="matrixContainer_step_5"></div>
 
         <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
           <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="4">
-            <i class="bi bi-arrow-left me-2"></i> Back: Mineralogy and Geochemistry Sub-criteria (B)
+            <i class="bi bi-arrow-left me-2"></i> Back: Formation Geomechanics Sub-criteria (B)
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_5">
             0 of 6 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="6">
-            Next: Interlayer Characteristics Sub-criteria (D) <i class="bi bi-arrow-right ms-2"></i>
+            Next: External Risk Factors Sub-criteria (D) <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
       </section>
 
       <!-- ====================================================================
-           STEP 6: Sub-criteria for D - Interlayer Characteristics (6 Comparisons)
+           STEP 6: Sub-criteria for D - External Risk Factors (6 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_6" data-step-index="6">
         <div class="step-header">
           <div class="step-number-badge step-badge-d">6</div>
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
-              <h4 class="step-title">Step 6: Sub-criteria for <span class="text-crit-d">D. Interlayer Characteristics</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 4 sub-criteria of interlayers</p>
+              <h4 class="step-title">Step 6: Sub-criteria for <span class="text-crit-d">D. External Risk Factors</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 external risk sub-criteria</p>
             </div>
-            <span class="badge badge-criteria-d px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+            <span class="badge badge-criteria-d px-3 py-2">6-Comparison Matrix (4 sub-criteria)</span>
           </div>
         </div>
-
 
         <div class="comparison-matrix" id="matrixContainer_step_6"></div>
 
         <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
           <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="5">
-            <i class="bi bi-arrow-left me-2"></i> Back: Formation Geomechanics Sub-criteria (C)
+            <i class="bi bi-arrow-left me-2"></i> Back: Lithological Heterogeneity Sub-criteria (C)
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_6">
             0 of 6 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="7">
-            Next: External Risk Factors Sub-criteria (E) <i class="bi bi-arrow-right ms-2"></i>
+            Next: E-ESG Sub-criteria (E) <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
       </section>
 
       <!-- ====================================================================
-           STEP 7: Sub-criteria for E - External Risk Factors (6 Comparisons)
+           STEP 7: Sub-criteria for E - Economic, Environmental, Social, and Governance (E-ESG) Criteria (6 Comparisons)
            ==================================================================== -->
       <section class="step-view step-container step-container-comparisons" id="stepView_7" data-step-index="7">
         <div class="step-header">
           <div class="step-number-badge step-badge-e">7</div>
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <div>
-              <h4 class="step-title">Step 7: Sub-criteria for <span class="text-crit-e">E. External Risk Factors</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 4 external risk sub-criteria</p>
+              <h4 class="step-title">Step 7: Sub-criteria for <span class="text-crit-e">E. Economic, Environmental, Social, and Governance (E-ESG) Criteria</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 E-ESG sub-criteria</p>
             </div>
-            <span class="badge badge-criteria-e px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+            <span class="badge badge-criteria-e px-3 py-2">6-Comparison Matrix (4 sub-criteria)</span>
           </div>
         </div>
-
 
         <div class="comparison-matrix" id="matrixContainer_step_7"></div>
 
         <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
           <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="6">
-            <i class="bi bi-arrow-left me-2"></i> Back: Interlayer Characteristics Sub-criteria (D)
+            <i class="bi bi-arrow-left me-2"></i> Back: External Risk Factors Sub-criteria (D)
           </button>
           <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_7">
             0 of 6 answered
           </div>
           <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="8">
-            Next: Logistics and Site Conditions Sub-criteria (F) <i class="bi bi-arrow-right ms-2"></i>
-          </button>
-        </div>
-      </section>
-
-      <!-- ====================================================================
-           STEP 8: Sub-criteria for F - Logistics and Site Conditions (3 Comparisons)
-           ==================================================================== -->
-      <section class="step-view step-container step-container-comparisons" id="stepView_8" data-step-index="8">
-        <div class="step-header">
-          <div class="step-number-badge step-badge-f">8</div>
-          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
-            <div>
-              <h4 class="step-title">Step 8: Sub-criteria for <span class="text-crit-f">F. Logistics and Site Conditions</span></h4>
-              <p class="step-subtitle">Compare the relevance among the 3 logistical and infrastructural sub-criteria</p>
-            </div>
-            <span class="badge badge-criteria-f px-3 py-2">3-Comparison Matrix (1 row &times; 3 columns)</span>
-          </div>
-        </div>
-
-
-        <div class="comparison-matrix" id="matrixContainer_step_8"></div>
-
-        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="7">
-            <i class="bi bi-arrow-left me-2"></i> Back: External Risk Factors Sub-criteria (E)
-          </button>
-          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_8">
-            0 of 3 answered
-          </div>
-          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="9">
             Next: General Review and Submission <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
       </section>
 
       <!-- ====================================================================
-           STEP 9: Responses Review, Remarks & Submission
+           STEP 8: Responses Review, Remarks & Submission
            ==================================================================== -->
-      <section class="step-view step-container step-container-finish" id="stepView_9" data-step-index="9">
+      <section class="step-view step-container step-container-finish" id="stepView_8" data-step-index="8">
         <div class="step-header">
-          <div class="step-number-badge step-number-finish">9</div>
+          <div class="step-number-badge step-number-finish">8</div>
           <div>
-            <h4 class="step-title">Step 9: General Review, Remarks & Submission</h4>
+            <h4 class="step-title">Step 8: General Review, Remarks & Submission</h4>
             <p class="step-subtitle">Verify full completion of analyses and submit your evaluations</p>
           </div>
         </div>
@@ -541,8 +505,8 @@
 
         <!-- Final Action Buttons -->
         <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2">
-          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="8">
-            <i class="bi bi-arrow-left me-2"></i> Back: Logistics and Site Conditions Sub-criteria (F)
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="7">
+            <i class="bi bi-arrow-left me-2"></i> Back: E-ESG Sub-criteria (E)
           </button>
 
           <div class="text-end">
@@ -571,6 +535,31 @@
     </div>
   </footer>
 
+  <!-- Modal 0: Detailed Criterion Technical Dossier -->
+  <div class="modal fade" id="criterionDetailModal" tabindex="-1" aria-labelledby="criterionDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg criterion-modal-sheet">
+        <div class="modal-header border-bottom py-3 px-4" id="criterionModalHeader">
+          <div class="d-flex align-items-center gap-3">
+            <span class="badge criterion-modal-badge" id="criterionModalBadge">A1</span>
+            <div>
+              <span class="text-uppercase small fw-bold text-muted criterion-modal-category" id="criterionModalCategory">Geological Formation</span>
+              <h5 class="modal-title fw-bold text-dark mb-0" id="criterionDetailModalLabel">Formation Depth</h5>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="criterionModalBody">
+          <!-- Dynamically populated via JS -->
+        </div>
+        <div class="modal-footer bg-light py-2 px-4 border-top d-flex justify-content-between align-items-center">
+          <span class="small text-muted"><i class="bi bi-info-circle me-1"></i> Technical criteria guide for site prioritization</span>
+          <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal 1: Complete Criteria Hierarchy Diagram -->
   <div class="modal fade" id="diagramModal" tabindex="-1" aria-labelledby="diagramModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -589,7 +578,7 @@
             </div>
             <ul class="hierarchy-groups" id="hierarchyGroups"></ul>
             <figcaption class="text-muted small text-center mt-4" id="hierarchyCaption">
-            Hierarchical diagram with the Main Objective at the top, decomposed into 6 Main Criteria and their respective Sub-criteria for multi-criteria evaluation.
+            Hierarchical diagram with the Main Objective at the top, decomposed into 5 Main Criteria and their respective Sub-criteria for multi-criteria evaluation.
             </figcaption>
           </figure>
         </div>
@@ -676,7 +665,7 @@
           </p>
           <ul class="text-start small text-secondary mb-3 ps-4">
             <li>Expert personal details (Name, Email, Institution, and Field).</li>
-            <li>All 45 pairwise comparisons already answered across criteria and sub-criteria.</li>
+            <li>All 44 pairwise comparisons already answered across criteria and sub-criteria.</li>
             <li>Technical remarks and additional comments.</li>
           </ul>
           <div class="alert alert-warning border-0 py-2 px-3 small text-dark mb-0 text-start">

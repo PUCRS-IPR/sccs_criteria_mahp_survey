@@ -4,12 +4,13 @@ const path = require('node:path');
 const { test } = require('node:test');
 const { runInContext } = require('node:vm');
 const { JSDOM } = require('jsdom');
-const { CRITERIA, SURVEY_VERSION } = require('../js/criteria.js');
+const { CRITERIA, SURVEY_VERSION } = require('../src/js/criteria.js');
 
 const root = path.join(__dirname, '..');
+const srcDir = path.join(root, 'src');
 const storageKey = 'ahp_cave_survey_progress_data';
-const html = readFileSync(path.join(root, 'index.html'), 'utf8');
-const scripts = ['js/criteria.js', 'js/app.js'].map((file) => readFileSync(path.join(root, file), 'utf8'));
+const html = readFileSync(path.join(srcDir, 'index.html'), 'utf8');
+const scripts = ['src/js/criteria.js', 'src/js/app.js'].map((file) => readFileSync(path.join(root, file), 'utf8'));
 
 async function openSurvey(t, saved) {
   const dom = new JSDOM(html, { url: 'https://survey.example/', runScripts: 'outside-only' });
@@ -34,7 +35,7 @@ async function openSurvey(t, saved) {
     document.getElementById('evaluatorEmail').value = 'expert@example.org';
     document.getElementById('evaluatorEducation').value = 'PhD in Geology';
     choose('GLOBAL', 'high');
-    for (const group of ['A', 'B', 'C', 'D', 'E', 'F']) choose(group, 'skip');
+    for (const group of ['A', 'B', 'C', 'D', 'E']) choose(group, 'skip');
   };
   const answer = (step) => {
     const section = document.getElementById(`stepView_${step}`);
@@ -53,15 +54,15 @@ async function openSurvey(t, saved) {
 
 test('confidence radios start unchecked and Main Criteria cannot be skipped', async (t) => {
   const { document, profile, choose } = await openSurvey(t);
-  assert.equal(document.querySelectorAll('#confidenceTableBody tr').length, 7);
+  assert.equal(document.querySelectorAll('#confidenceTableBody tr').length, 6);
   assert.equal(document.querySelectorAll('#confidenceTableBody input:checked').length, 0);
   assert.equal(document.querySelector('#stepperPill_2 .stepper-name-label').textContent, 'Main Criteria');
   assert.equal(document.querySelector('#stepView_2 .step-title').textContent, 'Step 2: Main Criteria');
-  assert.doesNotMatch(document.querySelector('#confidenceRow_2 th').textContent, /A to F/);
+  assert.doesNotMatch(document.querySelector('#confidenceRow_2 th').textContent, /A to E/);
   assert.equal(document.querySelector('input[name="confianca_GLOBAL"][value="skip"]'), null);
   profile();
   assert.equal(document.getElementById('stepperPill_2').disabled, false);
-  for (let step = 3; step <= 8; step++) {
+  for (let step = 3; step <= 7; step++) {
     assert.equal(document.getElementById(`stepperPill_${step}`).disabled, true);
     assert.equal(document.querySelectorAll(`#stepView_${step} input:not(:disabled), #stepView_${step} select:not(:disabled)`).length, 0);
   }
@@ -78,10 +79,10 @@ test('Step 1 requires education and an explicit choice for every topic', async (
   assert.equal(active(), 1);
   assert.match(document.getElementById('validationAlert').textContent, /Academic Background/);
   document.getElementById('evaluatorEducation').value = 'MSc in Engineering';
-  const confidenceF = document.querySelector('input[name="confianca_F"]:checked');
-  confidenceF.checked = false;
-  confidenceF.dispatchEvent(new document.defaultView.Event('change', { bubbles: true }));
-  document.getElementById('stepperPill_9').click();
+  const confidenceE = document.querySelector('input[name="confianca_E"]:checked');
+  confidenceE.checked = false;
+  confidenceE.dispatchEvent(new document.defaultView.Event('change', { bubbles: true }));
+  document.getElementById('stepperPill_8').click();
   assert.equal(active(), 1);
   assert.match(document.getElementById('validationAlert').textContent, /confidence level/);
 });
@@ -90,7 +91,7 @@ test('navigation skips declined topics in both directions and progress counts ac
   const { document, profile, choose, answer, active } = await openSurvey(t);
   profile();
   choose('C', 'moderate');
-  assert.match(document.getElementById('ahpProgressText').textContent, /0 of 21/);
+  assert.match(document.getElementById('ahpProgressText').textContent, /0 of 16/);
   document.getElementById('btnNextStep1').click();
   assert.equal(active(), 2);
   document.querySelector('#stepView_2 .btn-step-next').click();
@@ -100,9 +101,9 @@ test('navigation skips declined topics in both directions and progress counts ac
   document.getElementById('stepperPill_3').click();
   assert.equal(active(), 2);
   answer(2);
-  assert.match(document.getElementById('ahpProgressText').textContent, /15 of 21/);
-  document.getElementById('stepperPill_9').click();
-  document.querySelector('#stepView_9 .btn-step-prev').click();
+  assert.match(document.getElementById('ahpProgressText').textContent, /10 of 16/);
+  document.getElementById('stepperPill_8').click();
+  document.querySelector('#stepView_8 .btn-step-prev').click();
   assert.equal(active(), 5);
 });
 
@@ -112,7 +113,7 @@ test('answers survive opting out and reload, and return when the topic is enable
   first.choose('A', 'very_high');
   first.answer(3);
   first.choose('A', 'skip');
-  assert.match(first.document.getElementById('ahpProgressText').textContent, /0 of 15/);
+  assert.match(first.document.getElementById('ahpProgressText').textContent, /0 of 10/);
   const saved = JSON.parse(first.window.localStorage.getItem(storageKey));
   saved.currentStep = 3;
   const second = await openSurvey(t, saved);
@@ -121,9 +122,9 @@ test('answers survive opting out and reload, and return when the topic is enable
   assert.equal(second.document.querySelector('input[name="confianca_A"]:checked').value, 'skip');
   assert.equal(second.document.querySelector('#stepView_3 input:checked').disabled, true);
   second.choose('A', 'high');
-  assert.match(second.document.getElementById('ahpProgressText').textContent, /6 of 21/);
+  assert.match(second.document.getElementById('ahpProgressText').textContent, /10 of 20/);
   assert.equal(second.document.querySelector('#stepView_3 select').disabled, false);
-  second.document.getElementById('stepperPill_9').click();
+  second.document.getElementById('stepperPill_8').click();
   assert.match(second.document.getElementById('summaryEducation').textContent, /PhD/);
   assert.match(second.document.querySelector('.review-step-btn[data-target-step="3"]').textContent, /High confidence/);
 });
@@ -139,19 +140,19 @@ test('submission requires Main Criteria and omits all answers in declined topics
     payload = JSON.parse(options.body);
     return { ok: true, status: 200, text: async () => '{"success":true}' };
   };
-  document.getElementById('stepperPill_9').click();
+  document.getElementById('stepperPill_8').click();
   document.getElementById('submitBtn').click();
   assert.equal(payload, undefined);
   assert.equal(active(), 2);
   assert.match(document.getElementById('validationAlert').textContent, /Main Criteria/);
   answer(2);
-  document.getElementById('stepperPill_9').click();
+  document.getElementById('stepperPill_8').click();
   document.getElementById('submitBtn').click();
   assert.equal(payload.formacao, 'PhD in Geology');
   assert.equal(payload.confianca_GLOBAL, 'high');
   assert.equal(payload.confianca_A, 'skip');
-  assert.equal(Object.keys(payload).filter((key) => key.startsWith('mais_importante_')).length, 15);
-  assert.equal(Object.keys(payload).filter((key) => key.startsWith('intensidade_saaty_')).length, 15);
+  assert.equal(Object.keys(payload).filter((key) => key.startsWith('mais_importante_')).length, 10);
+  assert.equal(Object.keys(payload).filter((key) => key.startsWith('intensidade_saaty_')).length, 10);
   assert.equal(Object.keys(payload).some((key) => key.includes('A1')), false);
   await new Promise((resolve) => setImmediate(resolve));
 });
@@ -159,18 +160,18 @@ test('submission requires Main Criteria and omits all answers in declined topics
 test('incomplete selected sub-criteria block submission', async (t) => {
   const { window, document, profile, choose, answer, active } = await openSurvey(t);
   profile();
-  choose('F', 'low');
+  choose('B', 'low');
   answer(2);
   window.fetch = () => { assert.fail('Incomplete survey must not submit'); };
-  document.getElementById('stepperPill_9').click();
+  document.getElementById('stepperPill_8').click();
   document.getElementById('submitBtn').click();
-  assert.equal(active(), 8);
-  assert.match(document.getElementById('validationAlert').textContent, /Total pending: 3/);
+  assert.equal(active(), 4);
+  assert.match(document.getElementById('validationAlert').textContent, /Total pending: 6/);
 });
 
 test('older drafts return to Step 1 to collect the new fields', async (t) => {
   const { document, active } = await openSurvey(t, {
-    currentStep: 9,
+    currentStep: 8,
     evaluator: { name: 'Existing Expert', email: 'existing@example.org' },
     comparisons: {}
   });
@@ -179,11 +180,11 @@ test('older drafts return to Step 1 to collect the new fields', async (t) => {
   assert.equal(document.querySelectorAll('#confidenceTableBody input:checked').length, 0);
 });
 
-test('the HTML hierarchy contains all 6 criteria and 22 sub-criteria from the survey', async (t) => {
+test('the HTML hierarchy contains all 5 criteria and 21 sub-criteria from the survey', async (t) => {
   const { document } = await openSurvey(t);
   assert.equal(document.querySelector('#diagramModal img'), null);
-  assert.equal(document.querySelectorAll('.hierarchy-group').length, 6);
-  assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, 22);
+  assert.equal(document.querySelectorAll('.hierarchy-group').length, 5);
+  assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, 21);
   for (const criterion of CRITERIA) {
     const group = document.querySelector(`.hierarchy-theme-${criterion.code.toLowerCase()}`);
     assert.equal(group.querySelector('h6').textContent, criterion.fullName);
@@ -191,7 +192,7 @@ test('the HTML hierarchy contains all 6 criteria and 22 sub-criteria from the su
     assert.deepEqual(labels, criterion.subcriteria.map((item) => `${item.code}. ${item.name}`));
   }
   for (const img of document.querySelectorAll('img[src^="img/"]')) {
-    assert.ok(readFileSync(path.join(root, img.getAttribute('src'))).length);
+    assert.ok(readFileSync(path.join(srcDir, img.getAttribute('src'))).length);
   }
 });
 
@@ -210,25 +211,24 @@ test('topic help opens the matching branch and the general button restores the c
     assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, criterion.subcriteria.length);
   }
   open(document.querySelector('.topic-tree-trigger[data-tree-criterion="GLOBAL"]'));
-  assert.equal(document.querySelectorAll('.hierarchy-group').length, 6);
+  assert.equal(document.querySelectorAll('.hierarchy-group').length, 5);
   assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, 0);
   open(document.querySelector('header [data-bs-target="#diagramModal"]'));
-  assert.equal(document.querySelectorAll('.hierarchy-group').length, 6);
-  assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, 22);
+  assert.equal(document.querySelectorAll('.hierarchy-group').length, 5);
+  assert.equal(document.querySelectorAll('.hierarchy-subcriteria li').length, 21);
 });
 
 test('every compared criterion and sub-criterion has the same help across its appearances', async (t) => {
   const { document } = await openSurvey(t);
   const buttons = [...document.querySelectorAll('.criterion-help-trigger')];
-  assert.equal(buttons.length, 90);
+  assert.equal(buttons.length, 88);
   for (const criterion of CRITERIA.flatMap((item) => [item, ...item.subcriteria])) {
     const appearances = buttons.filter((button) => button.dataset.criterionCode === criterion.code);
     assert.ok(appearances.length >= 2);
     for (const button of appearances) {
-      assert.equal(button.title, `${criterion.fullName}: ${criterion.helpText}`);
-      assert.match(button.title, /Lorem ipsum/);
+      assert.equal(button.getAttribute('data-criterion-code'), criterion.code);
       assert.equal(button.closest('label'), null);
-      assert.ok(button.querySelector('.bi-question-circle'));
+      assert.ok(button.querySelector('.bi-info-circle'));
     }
   }
   assert.equal(document.querySelector('.step-intro-card'), null);
@@ -237,9 +237,9 @@ test('every compared criterion and sub-criterion has the same help across its ap
 test('drafts from previous criteria preserve the profile without reusing judgments for changed codes', async (t) => {
   const oldDraft = {
     criteriaVersion: 'previous-criteria',
-    currentStep: 9,
+    currentStep: 8,
     evaluator: { name: 'Existing Expert', email: 'existing@example.org', formacao: 'PhD in Geology' },
-    confidence: { GLOBAL: 'high', A: 'high', B: 'high', C: 'high', D: 'high', E: 'high', F: 'high' },
+    confidence: { GLOBAL: 'high', A: 'high', B: 'high', C: 'high', D: 'high', E: 'high' },
     comparisons: {
       E1_vs_E4: {
         chosenValue: 'E1. Associated tectonics', chosenCode: 'E1',
@@ -251,7 +251,7 @@ test('drafts from previous criteria preserve the profile without reusing judgmen
   assert.equal(active(), 1);
   assert.equal(document.getElementById('evaluatorName').value, 'Existing Expert');
   assert.equal(document.querySelectorAll('#ahpForm input[type="radio"]:checked').length, 0);
-  assert.match(document.getElementById('ahpProgressText').textContent, /0 of 45/);
+  assert.match(document.getElementById('ahpProgressText').textContent, /0 of 44/);
   assert.match(document.getElementById('validationAlert').textContent, /criteria have changed/);
   assert.deepEqual(JSON.parse(window.localStorage.getItem(`${storageKey}_previous_criteria`)), oldDraft);
   choose('GLOBAL', 'high');

@@ -82,8 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
       : mainCriteriaOnly ? "Main Criteria Tree" : "Hierarchical Criteria Model (Fuzzy-AHP)";
     document.getElementById("hierarchyCaption").textContent = selectedCriterion
       ? `${selectedCriterion.name} and its ${selectedCriterion.subcriteria.length} sub-criteria.`
-      : mainCriteriaOnly ? "Research objective and the six main criteria."
-        : "Hierarchical diagram with the Main Objective at the top, decomposed into 6 Main Criteria and their respective Sub-criteria for multi-criteria evaluation.";
+      : mainCriteriaOnly ? "Research objective and the five main criteria."
+        : "Hierarchical diagram with the Main Objective at the top, decomposed into 5 Main Criteria and their respective Sub-criteria for multi-criteria evaluation.";
     groups.innerHTML = criteria.map((criterion) => `
       <li class="hierarchy-group hierarchy-theme-${criterion.code.toLowerCase()}">
         <h6 class="hierarchy-criterion" id="hierarchyCriterion_${criterion.code}">${criterion.fullName}</h6>
@@ -243,27 +243,91 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    if (typeof bootstrap !== "undefined" && bootstrap.Tooltip) {
-      document.querySelectorAll(".criterion-help-trigger").forEach((button) => {
-        const tooltip = bootstrap.Tooltip.getOrCreateInstance(button, {
-          container: "body",
-          trigger: "hover focus click"
-        });
-        button.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") tooltip.hide();
-        });
+    document.querySelectorAll(".criterion-help-trigger").forEach((button) => {
+      const code = button.getAttribute("data-criterion-code");
+      if (!code) return;
+
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        openCriterionDetailModal(code);
       });
+
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openCriterionDetailModal(code);
+        }
+      });
+    });
+  }
+
+  function findCriterionByCode(code) {
+    for (const crit of CRITERIA) {
+      if (crit.code === code) return crit;
+      if (crit.subcriteria) {
+        const found = crit.subcriteria.find((s) => s.code === code);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function openCriterionDetailModal(code) {
+    const criterion = findCriterionByCode(code);
+    if (!criterion) return;
+
+    const modalEl = document.getElementById("criterionDetailModal");
+    if (!modalEl) return;
+
+    const themeCode = (criterion.parentCode || criterion.code).toLowerCase();
+    const parentCriterion = CRITERIA.find((c) => c.code === criterion.parentCode);
+    const categoryName = parentCriterion ? parentCriterion.fullName : "Main Criterion";
+
+    const badgeEl = document.getElementById("criterionModalBadge");
+    if (badgeEl) {
+      badgeEl.textContent = criterion.code;
+      badgeEl.className = `badge criterion-modal-badge badge-criteria-${themeCode}`;
+    }
+    const catEl = document.getElementById("criterionModalCategory");
+    if (catEl) catEl.textContent = categoryName;
+
+    const titleEl = document.getElementById("criterionDetailModalLabel");
+    if (titleEl) titleEl.textContent = criterion.name;
+
+    const bodyEl = document.getElementById("criterionModalBody");
+    if (!bodyEl) return;
+
+    const rawText = (criterion.helpText || criterion.description || "").trim();
+    const paragraphs = rawText
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+    const paragraphsHtml = paragraphs.map((p) => `<p class="criterion-modal-paragraph mb-3">${p}</p>`).join("");
+
+    bodyEl.innerHTML = `
+      <div class="mb-2">
+        <h6 class="criterion-section-title">
+          <i class="bi bi-file-earmark-text me-2 text-primary"></i>Technical Context & Geomechanical Mechanism
+        </h6>
+        <div>
+          ${paragraphsHtml}
+        </div>
+      </div>
+    `;
+
+    if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
     }
   }
 
   function renderCriterionHelp(criterion) {
-    const text = `${criterion.fullName}: ${criterion.helpText}`
-      .replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     return `<button type="button" class="criterion-help-trigger"
-                    data-criterion-code="${criterion.code}" data-bs-toggle="tooltip"
-                    data-bs-placement="top" data-bs-custom-class="criterion-tooltip"
-                    title="${text}" aria-label="About ${criterion.fullName}">
-              <i class="bi bi-question-circle" aria-hidden="true"></i>
+                    data-criterion-code="${criterion.code}"
+                    title="Click to learn more"
+                    aria-label="Click to learn more about ${criterion.fullName}">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
             </button>`;
   }
 
@@ -551,9 +615,8 @@ document.addEventListener("DOMContentLoaded", function () {
         let totalMissing = 0;
         const incompleteStepIndexes = [];
 
-        for (let s = 2; s <= 8; s++) {
-          if (!isStepEnabled(s)) continue;
-          const stepDef = SURVEY_STEPS.find((item) => item.stepIndex === s);
+        for (const stepDef of comparisonSteps) {
+          if (!isStepEnabled(stepDef.stepIndex)) continue;
           if (stepDef && stepDef.type === "comparisons" && Array.isArray(stepDef.pairs)) {
             const missingInStep = stepDef.pairs.filter((pair) => {
               const radioChecked = document.querySelector(`input[name="mais_importante_${pair.pairKey}"]:checked`);
@@ -563,7 +626,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (missingInStep.length > 0) {
               totalMissing += missingInStep.length;
-              incompleteStepIndexes.push(s);
+              incompleteStepIndexes.push(stepDef.stepIndex);
               if (!firstIncompleteStep) {
                 firstIncompleteStep = stepDef;
                 firstIncompletePair = missingInStep[0];
@@ -660,9 +723,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Hide current step
     const currentView = document.getElementById(`stepView_${currentStep}`);
     if (currentView) {
-      if (typeof bootstrap !== "undefined" && bootstrap.Tooltip) {
+      if (typeof bootstrap !== "undefined") {
         currentView.querySelectorAll(".criterion-help-trigger").forEach((button) => {
-          bootstrap.Tooltip.getInstance(button)?.hide();
+          bootstrap.Popover?.getInstance(button)?.hide();
+          bootstrap.Tooltip?.getInstance(button)?.hide();
         });
       }
       currentView.classList.remove("active");
@@ -680,8 +744,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update horizontal Stepper visual
     updateStepperVisual();
 
-    // If step 9 (Review and Submit), refresh summary
-    if (currentStep === 9) {
+    // If final step (Review and Submit), refresh summary
+    if (currentStep === totalSteps) {
       updateReviewSummary();
     }
 

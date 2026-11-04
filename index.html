@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="48x48" href="img/ipr-favicon.png">
+  <title>IPR · PUCRS | Site Selection for SCCS in Ultra-Deepwater Salt Domes</title>
+  <meta name="description" content="Expert survey conducted by IPR — Instituto do Petróleo e dos Recursos Naturais, PUCRS — for site selection for SCCS in ultra-deepwater salt domes using Fuzzy-AHP.">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles (100% free of inline styles in HTML) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Hero / Main Header -->
+  <header class="hero-section text-center">
+    <div class="container-fluid px-lg-5">
+      <div class="institution-header">
+        <a class="institution-logo-link" href="https://www.pucrs.br/ipr/" target="_blank" rel="noopener noreferrer" aria-label="IPR — Instituto do Petróleo e dos Recursos Naturais, PUCRS (opens in a new tab)">
+          <img class="institution-ipr-logo" src="img/ipr-logo.png" alt="IPR — Instituto do Petróleo e dos Recursos Naturais">
+        </a>
+        <div class="institution-heading">
+          <span class="institution-eyebrow">Research conducted by IPR · PUCRS</span>
+          <span class="institution-name">Instituto do Petróleo e dos Recursos Naturais</span>
+        </div>
+        <a class="institution-logo-link" href="https://www.pucrs.br/" target="_blank" rel="noopener noreferrer" aria-label="PUCRS (opens in a new tab)">
+          <img class="institution-pucrs-logo" src="img/pucrs-logo.svg" alt="PUCRS">
+        </a>
+      </div>
+      <span class="badge hero-badge px-3 py-2 rounded-pill mb-3">
+        <i class="bi bi-geo-alt-fill me-1"></i> CO₂ Storage Sites (CCUS) &bull; Fuzzy-AHP Method
+      </span>
+      <h1 class="display-6 fw-bold mb-2 hero-title">
+        Site Selection for SCCS in Ultra-Deepwater Salt Domes
+      </h1>
+      <p class="lead mb-3 mx-auto text-light hero-lead">
+        Expert Pairwise Judgment Questionnaire (Fuzzy-AHP Method). Hierarchical evaluation of main criteria and respective geological, operational, and safety sub-criteria.
+      </p>
+
+      <!-- Help and Quick Reference Buttons -->
+      <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#diagramModal">
+          <i class="bi bi-diagram-3 me-1"></i> View Hierarchy Diagram
+        </button>
+        <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#saatyScaleModal">
+          <i class="bi bi-card-checklist me-1"></i> Judgment Scale Guide
+        </button>
+        <button class="btn btn-outline-danger btn-sm text-white" type="button" id="btnResetHero" data-bs-toggle="modal" data-bs-target="#resetConfirmModal" title="Delete data saved in browser and reset form">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Progress
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container-fluid main-container mb-5">
+
+    <!-- Sticky Progress Bar and Stepper Navigation -->
+    <div class="sticky-progress-bar shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary px-2 py-1" id="currentStepBadge">Step 1 of 9</span>
+          <span class="small fw-semibold text-secondary" id="currentStepName">Context & Identification</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span class="badge bg-light text-secondary border small d-inline-flex align-items-center gap-1" id="saveStatusIndicator" title="Your progress is automatically saved to this browser's local storage">
+            <i class="bi bi-cloud-check text-success" id="saveStatusIcon"></i>
+            <span id="saveStatusText">Saved locally</span>
+          </span>
+          <span class="small fw-bold text-primary" id="ahpProgressText">
+            0 of 45 comparisons completed (0%)
+          </span>
+        </div>
+      </div>
+
+      <!-- Overall Progress Bar -->
+      <div class="progress custom-progress-track mb-3">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary ahp-progress-bar-fill" 
+             id="ahpProgressBar" 
+             role="progressbar" 
+             aria-valuenow="0" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+        </div>
+      </div>
+
+      <!-- Horizontal Interactive Stepper (Steps 1 to 9 with criteria names) -->
+      <nav class="stepper-nav" aria-label="Step navigation by criteria">
+        <div class="stepper-track" id="stepperTrack">
+          <!-- Dynamically generated via JS with real criteria/sub-criteria names and thematic badges -->
+        </div>
+      </nav>
+    </div>
+
+    <!-- Global Validation Alert Area -->
+    <div id="validationAlert"></div>
+
+    <!-- Web3Forms Form -->
+    <form id="ahpForm" 
+          action="https://api.web3forms.com/submit" 
+          method="POST" novalidate>
+
+      <input type="hidden" name="access_key" value="b7fcd54a-0764-49b7-ab97-958c10fdb7f5">
+      <input type="hidden" name="subject" value="New Fuzzy-AHP Evaluation - SCCS in Ultra-Deepwater Salt Domes | IPR - PUCRS">
+      <input type="hidden" name="from_name" value="IPR - PUCRS | Fuzzy-AHP Survey">
+
+      <!-- ====================================================================
+           STEP 1: Context and Expert Registration Details
+           ==================================================================== -->
+      <section class="step-view active step-container step-container-evaluator" id="stepView_1" data-step-index="1">
+        <div class="step-header">
+          <div class="step-number-badge">1</div>
+          <div>
+            <h4 class="step-title">Step 1: Survey Context & Expert Identification</h4>
+            <p class="step-subtitle">Objective, background, and registration data for methodological validation</p>
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <!-- Left Column: Context, Objective, and Methodology -->
+          <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm bg-light-subtle">
+              <div class="card-body p-4">
+                <h5 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-info-circle-fill me-2"></i>Research Objective
+                </h5>
+                <p class="text-secondary small leading-relaxed mb-3">
+                  Conducted by <strong>IPR — Instituto do Petróleo e dos Recursos Naturais, PUCRS</strong>.
+                  This scientific research aims to <strong>Select and Prioritize Sites for SCCS in Ultra-Deepwater Salt Domes</strong>, using the multi-criteria <strong>Fuzzy-AHP (Analytic Hierarchy Process)</strong> method.
+                </p>
+                <div class="alert alert-primary border-0 py-2 px-3 small mb-3">
+                  <i class="bi bi-lightbulb me-1"></i> The hierarchical structure comprises <strong>6 main criteria</strong> and <strong>22 specific sub-criteria</strong>, according to the official technical diagram.
+                </div>
+                
+                <h6 class="fw-bold text-dark mb-2">
+                  <i class="bi bi-sliders me-1 text-primary"></i> Response Dynamics:
+                </h6>
+                <ol class="small text-secondary ps-3 mb-3">
+                  <li><strong>Question 1:</strong> Choose which of the two criteria/sub-criteria you consider to have higher priority or influence.</li>
+                  <li><strong>Question 2:</strong> Indicate the verbal degree of superiority on the Saaty scale (from <em>Equal importance</em> to <em>Extremely superior</em>).</li>
+                </ol>
+
+                <div class="text-center pt-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#diagramModal">
+                    <i class="bi bi-diagram-3-fill me-1"></i> View Complete Criteria Tree
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Expert Identification Data -->
+          <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm bg-white">
+              <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-3">
+                  <i class="bi bi-person-lines-fill me-2 text-primary"></i>Expert Information
+                </h5>
+                <p class="text-muted small mb-3">
+                  Fill in your professional information for registration and reliability of the pairwise analyses:
+                </p>
+
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label for="evaluatorName" class="form-label fw-semibold small text-dark">
+                      Full Name <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                      <input type="text" class="form-control" id="evaluatorName" name="name" placeholder="e.g., Dr. Jane Doe" required>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="evaluatorEmail" class="form-label fw-semibold small text-dark">
+                      Institutional or Professional Email <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" id="evaluatorEmail" name="email" placeholder="your.email@institution.edu" required>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="evaluatorOrg" class="form-label fw-semibold small text-dark">
+                      Institution / Company / University
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light text-muted"><i class="bi bi-building"></i></span>
+                      <input type="text" class="form-control" id="evaluatorOrg" name="instituicao" placeholder="e.g., University, Research Center, Energy Co.">
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="evaluatorEducation" class="form-label fw-semibold small text-dark">
+                      Academic Background / Qualifications <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light text-muted"><i class="bi bi-mortarboard"></i></span>
+                      <input type="text" class="form-control" id="evaluatorEducation" name="formacao" placeholder="e.g., BSc in Geology, MSc in Geomechanics, PhD in Engineering" required>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="evaluatorRole" class="form-label fw-semibold small text-dark">
+                      Field of Expertise / Primary Specialty
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light text-muted"><i class="bi bi-briefcase"></i></span>
+                      <input type="text" class="form-control" id="evaluatorRole" name="area_atuacao" placeholder="e.g., Geomechanics, Stratigraphy, Geochemistry, CCUS">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold text-dark" id="confidenceTitle">Confidence by Topic</h5>
+            <p class="small text-secondary" id="confidenceHelp">
+              Select one option for each topic. Main Criteria is mandatory for every expert.
+              For sub-criteria, select “I do not want to answer” to disable the associated step.
+              You can return here to change your choices at any time.
+            </p>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle confidence-table" aria-labelledby="confidenceTitle" aria-describedby="confidenceHelp">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Topic</th>
+                    <th scope="col">I do not want to answer</th>
+                    <th scope="col">Very low confidence</th>
+                    <th scope="col">Low confidence</th>
+                    <th scope="col">Moderate confidence</th>
+                    <th scope="col">High confidence</th>
+                    <th scope="col">Very high confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="confidenceTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Bar Step 1 -->
+        <div class="step-nav-footer d-flex justify-content-end align-items-center">
+          <button type="button" class="btn btn-primary btn-lg px-4 py-2" id="btnNextStep1">
+            Start: Main Criteria <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 2: Main Criteria (15 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_2" data-step-index="2">
+        <div class="step-header">
+          <div class="step-number-badge">2</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 2: Main Criteria</h4>
+              <p class="step-subtitle">Evaluate the pairwise relative importance among the 6 fundamental main criteria</p>
+            </div>
+            <span class="badge bg-primary px-3 py-2">15-Comparison Matrix (5 rows &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <!-- Compact Card Matrix filled via JS -->
+        <div class="comparison-matrix" id="matrixContainer_step_2"></div>
+
+        <!-- Navigation Footer Step 2 -->
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="1">
+            <i class="bi bi-arrow-left me-2"></i> Back: Expert Details
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_2">
+            0 of 15 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="3">
+            Next: Geological Formation Sub-criteria (A) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 3: Sub-criteria for A - Geological Formation (6 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_3" data-step-index="3">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-a">3</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 3: Sub-criteria for <span class="text-crit-a">A. Geological Formation</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 sub-criteria of the host evaporite formation</p>
+            </div>
+            <span class="badge badge-criteria-a px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_3"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="2">
+            <i class="bi bi-arrow-left me-2"></i> Back: Main Criteria
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_3">
+            0 of 6 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="4">
+            Next: Mineralogy and Geochemistry Sub-criteria (B) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 4: Sub-criteria for B - Mineralogy and Geochemistry (3 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_4" data-step-index="4">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-b">4</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 4: Sub-criteria for <span class="text-crit-b">B. Mineralogy and Geochemistry</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 3 mineralogical and geochemical sub-criteria</p>
+            </div>
+            <span class="badge badge-criteria-b px-3 py-2">3-Comparison Matrix (1 row &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_4"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="3">
+            <i class="bi bi-arrow-left me-2"></i> Back: Geological Formation Sub-criteria (A)
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_4">
+            0 of 3 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="5">
+            Next: Formation Geomechanics Sub-criteria (C) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 5: Sub-criteria for C - Formation Geomechanics (6 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_5" data-step-index="5">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-c">5</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 5: Sub-criteria for <span class="text-crit-c">C. Formation Geomechanics</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 stability and geomechanical stress sub-criteria</p>
+            </div>
+            <span class="badge badge-criteria-c px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_5"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="4">
+            <i class="bi bi-arrow-left me-2"></i> Back: Mineralogy and Geochemistry Sub-criteria (B)
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_5">
+            0 of 6 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="6">
+            Next: Interlayer Characteristics Sub-criteria (D) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 6: Sub-criteria for D - Interlayer Characteristics (6 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_6" data-step-index="6">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-d">6</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 6: Sub-criteria for <span class="text-crit-d">D. Interlayer Characteristics</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 sub-criteria of interlayers</p>
+            </div>
+            <span class="badge badge-criteria-d px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_6"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="5">
+            <i class="bi bi-arrow-left me-2"></i> Back: Formation Geomechanics Sub-criteria (C)
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_6">
+            0 of 6 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="7">
+            Next: External Risk Factors Sub-criteria (E) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 7: Sub-criteria for E - External Risk Factors (6 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_7" data-step-index="7">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-e">7</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 7: Sub-criteria for <span class="text-crit-e">E. External Risk Factors</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 4 external risk sub-criteria</p>
+            </div>
+            <span class="badge badge-criteria-e px-3 py-2">6-Comparison Matrix (2 rows &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_7"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="6">
+            <i class="bi bi-arrow-left me-2"></i> Back: Interlayer Characteristics Sub-criteria (D)
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_7">
+            0 of 6 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="8">
+            Next: Logistics and Site Conditions Sub-criteria (F) <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 8: Sub-criteria for F - Logistics and Site Conditions (3 Comparisons)
+           ==================================================================== -->
+      <section class="step-view step-container step-container-comparisons" id="stepView_8" data-step-index="8">
+        <div class="step-header">
+          <div class="step-number-badge step-badge-f">8</div>
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <div>
+              <h4 class="step-title">Step 8: Sub-criteria for <span class="text-crit-f">F. Logistics and Site Conditions</span></h4>
+              <p class="step-subtitle">Compare the relevance among the 3 logistical and infrastructural sub-criteria</p>
+            </div>
+            <span class="badge badge-criteria-f px-3 py-2">3-Comparison Matrix (1 row &times; 3 columns)</span>
+          </div>
+        </div>
+
+
+        <div class="comparison-matrix" id="matrixContainer_step_8"></div>
+
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="7">
+            <i class="bi bi-arrow-left me-2"></i> Back: External Risk Factors Sub-criteria (E)
+          </button>
+          <div class="text-muted small fw-semibold step-completion-indicator" id="stepCompletion_8">
+            0 of 3 answered
+          </div>
+          <button type="button" class="btn btn-primary px-4 py-2 btn-step-next" data-target-step="9">
+            Next: General Review and Submission <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           STEP 9: Responses Review, Remarks & Submission
+           ==================================================================== -->
+      <section class="step-view step-container step-container-finish" id="stepView_9" data-step-index="9">
+        <div class="step-header">
+          <div class="step-number-badge step-number-finish">9</div>
+          <div>
+            <h4 class="step-title">Step 9: General Review, Remarks & Submission</h4>
+            <p class="step-subtitle">Verify full completion of analyses and submit your evaluations</p>
+          </div>
+        </div>
+
+        <!-- Expert Summary Panel and Status per Group -->
+        <div class="row g-3 mb-4">
+          <div class="col-lg-5">
+            <div class="card h-100 border-0 shadow-sm bg-light-subtle">
+              <div class="card-body p-3">
+                <h6 class="fw-bold text-dark mb-2">
+                  <i class="bi bi-person-check-fill me-1 text-primary"></i> Confirmed Identification:
+                </h6>
+                <div class="small text-secondary mb-1">
+                  <strong>Expert:</strong> <span id="summaryName" class="text-dark">Not provided</span>
+                </div>
+                <div class="small text-secondary mb-1">
+                  <strong>Email:</strong> <span id="summaryEmail" class="text-dark">Not provided</span>
+                </div>
+                <div class="small text-secondary mb-1">
+                  <strong>Institution:</strong> <span id="summaryOrg" class="text-dark">-</span>
+                </div>
+                <div class="small text-secondary mb-1">
+                  <strong>Academic Background:</strong> <span id="summaryEducation" class="text-dark">-</span>
+                </div>
+                <div class="small text-secondary">
+                  <strong>Field / Specialty:</strong> <span id="summaryRole" class="text-dark">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card h-100 border-0 shadow-sm bg-white">
+              <div class="card-body p-3">
+                <h6 class="fw-bold text-dark mb-2">
+                  <i class="bi bi-check-all me-1 text-success"></i> Pairwise Comparisons Status:
+                </h6>
+                <div class="row g-2 small" id="summaryGroupsStatus">
+                  <!-- Dynamically injected with status of each step -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Remarks and Additional Comments -->
+        <div class="mb-4">
+          <label for="evaluatorNotes" class="form-label fw-semibold text-dark">
+            Technical Remarks or Additional Justifications (Optional):
+          </label>
+          <textarea class="form-control" 
+                    id="evaluatorNotes" 
+                    name="message" 
+                    rows="3" 
+                    placeholder="Add considerations regarding evaporite basin peculiarities, operational constraints, or qualitative justifications..."></textarea>
+        </div>
+
+        <!-- Final Action Buttons -->
+        <div class="step-nav-footer d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2">
+          <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-step-prev" data-target-step="8">
+            <i class="bi bi-arrow-left me-2"></i> Back: Logistics and Site Conditions Sub-criteria (F)
+          </button>
+
+          <div class="text-end">
+            <button type="submit" id="submitBtn" class="btn btn-success btn-lg px-5 py-3 shadow">
+              <i class="bi bi-send-fill me-2"></i> Submit All Evaluations
+            </button>
+            <div class="text-muted small mt-1">
+              All judgments will be submitted with methodological integrity.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </form>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="institution-footer py-4 small">
+    <div class="container-fluid main-container d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <a href="https://www.pucrs.br/ipr/" target="_blank" rel="noopener noreferrer" class="institution-footer-link">IPR · PUCRS — Instituto do Petróleo e dos Recursos Naturais</a>
+        <p class="mb-0 mt-2">Scientific Research · SCCS in Ultra-Deepwater Salt Domes · Fuzzy-AHP</p>
+      </div>
+      <img class="institution-pucrs-logo" src="img/pucrs-logo.svg" alt="PUCRS" loading="lazy">
+    </div>
+  </footer>
+
+  <!-- Modal 1: Complete Criteria Hierarchy Diagram -->
+  <div class="modal fade" id="diagramModal" tabindex="-1" aria-labelledby="diagramModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header institution-modal-header text-white">
+          <h5 class="modal-title" id="diagramModalLabel">
+            <i class="bi bi-diagram-3-fill me-2 text-info"></i> <span id="diagramModalTitleText">Hierarchical Criteria Model (Fuzzy-AHP)</span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <figure class="hierarchy-diagram mb-0" aria-labelledby="hierarchyCaption">
+            <div class="hierarchy-objective">
+              <span class="hierarchy-level-label">Research objective</span>
+              <h6 class="mb-0 fw-bold">Site Selection for SCCS in Ultra-Deepwater Salt Domes</h6>
+            </div>
+            <ul class="hierarchy-groups" id="hierarchyGroups"></ul>
+            <figcaption class="text-muted small text-center mt-4" id="hierarchyCaption">
+            Hierarchical diagram with the Main Objective at the top, decomposed into 6 Main Criteria and their respective Sub-criteria for multi-criteria evaluation.
+            </figcaption>
+          </figure>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Saaty Verbal Scale Guide -->
+  <div class="modal fade" id="saatyScaleModal" tabindex="-1" aria-labelledby="saatyScaleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="saatyScaleModalLabel">
+            <i class="bi bi-card-checklist me-2"></i> Pairwise Judgment Scale Guide
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-secondary small mb-3">
+            In the AHP / Fuzzy-AHP method, experts perform 1-on-1 comparisons between pairs of criteria or sub-criteria. The evaluation is conducted in two sequential steps:
+          </p>
+          <div class="card border-0 bg-light p-3 mb-3">
+            <h6 class="fw-bold text-dark mb-2">1. Choice of Dominant Criterion:</h6>
+            <p class="small text-secondary mb-0">Indicate which of the two elements under evaluation has a greater impact or relevance to the objective.</p>
+          </div>
+          <div class="card border-0 bg-light p-3 mb-3">
+            <h6 class="fw-bold text-dark mb-2">2. Intensity of Preference (Verbal Scale):</h6>
+            <ul class="small text-secondary mb-0 ps-3">
+              <li><strong>Equal importance:</strong> Both criteria contribute equally to the objective.</li>
+              <li><strong>Moderately superior:</strong> Experience and judgment slightly favor one criterion over the other.</li>
+              <li><strong>Superior:</strong> Experience and judgment strongly favor one criterion over the other.</li>
+              <li><strong>Very superior:</strong> One criterion is very strongly favored, with practical, demonstrable dominance.</li>
+              <li><strong>Extremely superior:</strong> The evidence favoring one criterion over another is of the highest possible order of affirmation.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Understood</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Submission Success -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-body text-center p-5">
+          <div class="text-success mb-3 modal-success-icon">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h3 class="fw-bold mb-3" id="successModalLabel">Evaluations Submitted Successfully!</h3>
+          <p class="text-muted mb-4">
+            Your pairwise judgments for the selected topics have been recorded successfully. We sincerely appreciate your valuable contribution to this research on SCCS in ultra-deepwater salt domes.
+          </p>
+          <button type="button" class="btn btn-success px-4 py-2" onclick="location.reload();">
+            <i class="bi bi-arrow-repeat me-1"></i> Submit New Evaluation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: LocalStorage Progress Reset Confirmation -->
+  <div class="modal fade" id="resetConfirmModal" tabindex="-1" aria-labelledby="resetConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="resetConfirmModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmation to Reset Questionnaire
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="text-danger mb-3 modal-danger-icon">
+            <i class="bi bi-trash3-fill"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Are you sure you want to reset the entire questionnaire?</h5>
+          <p class="text-secondary small mb-3">
+            This operation will <strong>permanently delete all data stored in this browser's Local Storage</strong>:
+          </p>
+          <ul class="text-start small text-secondary mb-3 ps-4">
+            <li>Expert personal details (Name, Email, Institution, and Field).</li>
+            <li>All 45 pairwise comparisons already answered across criteria and sub-criteria.</li>
+            <li>Technical remarks and additional comments.</li>
+          </ul>
+          <div class="alert alert-warning border-0 py-2 px-3 small text-dark mb-0 text-start">
+            <i class="bi bi-info-circle-fill text-warning me-1"></i> After confirmation, the form will be reset to its initial state at <strong>Step 1</strong>. This action cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer bg-light d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Cancel and Keep Data
+          </button>
+          <button type="button" class="btn btn-danger px-4" id="confirmResetBtn">
+            <i class="bi bi-trash3-fill me-1"></i> Yes, Confirm and Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery (optional/compatibility) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Criteria, Subcriteria and Scale Definitions -->
+  <script src="js/criteria.js"></script>
+  <!-- Application Logic, Steps Wizard and Matrix Rendering -->
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "ahp-cave-survey",
+  "version": "1.0.0",
+  "description": "Formulário Fuzzy-AHP para avaliação paritária de critérios para seleção de sítios de armazenamento de CO2 em cavernas de sal",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node tests/test_verification.js && node --test tests/topic_preferences.test.js",
+    "test:submit": "node tests/submit_test_submissions.js",
+    "demo:monte_carlo": "python .conceitos/simulacao_monte_carlo.py",
+    "demo:monte_carlo:export": "python .conceitos/simulacao_monte_carlo.py --export"
+  },
+  "keywords": [
+    "fuzzy-ahp",
+    "ahp",
+    "co2-storage",
+    "cavern-survey",
+    "web3forms"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^30.1.3"
+  }
+}

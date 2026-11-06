@@ -382,7 +382,12 @@ a {
 
 /* Responsividade Mobile para Tabela de Confiança (Transformação em Cards Nativos) */
 @media (max-width: 767.98px) {
+  .confidence-table-wrapper {
+    overflow: visible;
+  }
+
   .confidence-table {
+    display: block;
     min-width: 0 !important;
     width: 100% !important;
     border: none !important;
@@ -402,9 +407,12 @@ a {
   }
 
   .confidence-table tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
+    display: block;
+    width: 100%;
+  }
+
+  .confidence-table tbody > tr + tr {
+    margin-top: 0.85rem;
   }
 
   .confidence-table tr {

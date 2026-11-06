@@ -6,6 +6,15 @@
 
 const SURVEY_VERSION = "ultra-deepwater-salt-domes-v3";
 
+const CONFIDENCE_LEVELS = [
+  { value: "skip", label: "I do not want to answer" },
+  { value: "very_low", label: "Very low confidence" },
+  { value: "low", label: "Low confidence" },
+  { value: "moderate", label: "Moderate confidence" },
+  { value: "high", label: "High confidence" },
+  { value: "very_high", label: "Very high confidence" }
+];
+
 const CRITERION_HELP_PLACEHOLDER = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 const CRITERIA = [
@@ -594,6 +603,7 @@ function getAllSurveyPairs() {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     SURVEY_VERSION,
+    CONFIDENCE_LEVELS,
     CRITERIA,
     SAATY_SCALE_OPTIONS,
     SURVEY_STEPS,

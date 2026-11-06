@@ -16,14 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const stepActivePairIndex = { 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
   const stepViewMode = { 2: "step", 3: "step", 4: "step", 5: "step", 6: "step", 7: "step" };
   const desktopComparisonLayout = window.matchMedia?.("(min-width: 768px)");
-  const confidenceLevels = [
-    { value: "skip", label: "I do not want to answer" },
-    { value: "very_low", label: "Very low confidence" },
-    { value: "low", label: "Low confidence" },
-    { value: "moderate", label: "Moderate confidence" },
-    { value: "high", label: "High confidence" },
-    { value: "very_high", label: "Very high confidence" }
-  ];
+  const confidenceLevels = CONFIDENCE_LEVELS;
 
   // Global DOM elements
   const form = document.getElementById("ahpForm");
@@ -44,13 +37,18 @@ document.addEventListener("DOMContentLoaded", function () {
   // 2. Render comparison matrices for steps 2 to 8
   renderAllComparisonMatrices();
   setupPairStepControls();
-  desktopComparisonLayout?.addEventListener("change", () => {
+  const updateComparisonLayout = () => {
     comparisonSteps.forEach((step) => updatePairStepView(step.stepIndex));
-  });
+  };
+  if (desktopComparisonLayout?.addEventListener) {
+    desktopComparisonLayout.addEventListener("change", updateComparisonLayout);
+  } else {
+    desktopComparisonLayout?.addListener?.(updateComparisonLayout);
+  }
   for (let s = 2; s <= 7; s++) {
     updatePairStepView(s);
   }
-  renderConfidenceTable();
+  setupConfidenceControls();
   renderHierarchyDiagram();
   document.getElementById("diagramModal")?.addEventListener("show.bs.modal", (event) => {
     renderHierarchyDiagram(event.relatedTarget?.getAttribute("data-tree-criterion") || "");
@@ -114,36 +112,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return !step || stepIndex === 2 || getConfidence(step) !== "skip";
   }
 
-  function renderConfidenceTable() {
+  function setupConfidenceControls() {
     const body = document.getElementById("confidenceTableBody");
-    body.innerHTML = comparisonSteps.map((step) => `
-      <tr id="confidenceRow_${step.stepIndex}">
-        <th scope="row">
-          <div class="topic-cell-content">
-            <button type="button" class="btn topic-tree-trigger"
-                    data-bs-toggle="modal" data-bs-target="#diagramModal"
-                    data-tree-criterion="${step.groupKey}"
-                    title="View criteria tree" data-bs-placement="top"
-                    aria-label="View criteria tree: ${step.navTitle}"
-                    aria-controls="diagramModal" aria-haspopup="dialog">
-              <i class="bi bi-question-circle" aria-hidden="true"></i>
-            </button>
-            <span>
-              <span class="badge ${step.badgeClass}">${step.codeBadge}</span>
-              ${step.navTitle}${step.stepIndex === 2 ? ' <span class="small text-muted">(Required)</span>' : ''}
-            </span>
-          </div>
-        </th>
-        ${confidenceLevels.map((level) => step.stepIndex === 2 && level.value === "skip"
-          ? '<td><div class="confidence-option-required"><span class="small text-muted">Required for all experts</span></div></td>'
-          : `<td><label class="confidence-option">
-              <input type="radio" class="form-check-input" name="confianca_${step.groupKey}"
-                     value="${level.value}" aria-label="${step.navTitle}: ${level.label}" required>
-              <span class="confidence-level-label">${level.label}</span>
-            </label></td>`).join("")}
-      </tr>
-    `).join("");
-
     if (typeof bootstrap !== "undefined" && bootstrap.Tooltip) {
       body.querySelectorAll(".topic-tree-trigger").forEach((button) => {
         const tooltip = bootstrap.Tooltip.getOrCreateInstance(button, { container: "body", trigger: "hover focus" });

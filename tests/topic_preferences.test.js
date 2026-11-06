@@ -12,6 +12,26 @@ const storageKey = 'ahp_cave_survey_progress_data';
 const html = readFileSync(path.join(srcDir, 'index.html'), 'utf8');
 const scripts = ['src/js/criteria.js', 'src/js/app.js'].map((file) => readFileSync(path.join(root, file), 'utf8'));
 
+test('confidence choices are present before application scripts run', () => {
+  const dom = new JSDOM(html);
+  try {
+    const body = dom.window.document.getElementById('confidenceTableBody');
+    assert.equal(body.rows.length, 6);
+    assert.equal(body.querySelectorAll('input[type="radio"]').length, 35);
+    for (const group of ['GLOBAL', ...CRITERIA.map((criterion) => criterion.code)]) {
+      const radios = body.querySelectorAll(`input[name="confianca_${group}"]`);
+      assert.equal(radios.length, group === 'GLOBAL' ? 5 : 6);
+      for (const radio of radios) {
+        assert.equal(radio.checked, false);
+        assert.ok(radio.closest('label').textContent.trim());
+      }
+    }
+    assert.equal(body.querySelector('input[name="confianca_GLOBAL"][value="skip"]'), null);
+  } finally {
+    dom.window.close();
+  }
+});
+
 async function openSurvey(t, saved) {
   const dom = new JSDOM(html, { url: 'https://survey.example/', runScripts: 'outside-only' });
   t.after(() => dom.window.close());

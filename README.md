@@ -11,6 +11,10 @@ npm start
 
 Run the automated checks with `npm test`.
 
+After changing JavaScript, CSS, confidence levels or topic definitions, run
+`npm run generate:confidence` to update the initial options and local asset versions.
+The automated checks verify that the HTML stays in sync with the source files.
+
 ## GitHub Pages
 
 The website lives in `src/`. The deployment workflow publishes the contents of that folder at:

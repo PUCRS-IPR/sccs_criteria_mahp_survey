@@ -5,7 +5,8 @@
   "main": "src/index.html",
   "scripts": {
     "start": "npx serve src",
-    "test": "node tests/test_verification.js && node --test tests/topic_preferences.test.js",
+    "generate:confidence": "node scripts/generate-confidence-table.js",
+    "test": "node scripts/generate-confidence-table.js --check && node tests/test_verification.js && node --test tests/topic_preferences.test.js",
     "test:submit": "node tests/submit_test_submissions.js",
     "demo:monte_carlo": "python .conceitos/simulacao_monte_carlo.py",
     "demo:monte_carlo:export": "python .conceitos/simulacao_monte_carlo.py --export"

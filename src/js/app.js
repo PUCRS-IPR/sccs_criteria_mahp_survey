@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const allPairs = getAllSurveyPairs();
   const comparisonSteps = SURVEY_STEPS.filter((step) => step.type === "comparisons");
   const topicConfidence = {};
+  const stepActivePairIndex = { 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
+  const stepViewMode = { 2: "step", 3: "step", 4: "step", 5: "step", 6: "step", 7: "step" };
   const confidenceLevels = [
     { value: "skip", label: "I do not want to answer" },
     { value: "very_low", label: "Very low confidence" },
@@ -39,6 +41,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 2. Render comparison matrices for steps 2 to 8
   renderAllComparisonMatrices();
+  setupPairStepControls();
+  for (let s = 2; s <= 7; s++) {
+    updatePairStepView(s);
+  }
   renderConfidenceTable();
   renderHierarchyDiagram();
   document.getElementById("diagramModal")?.addEventListener("show.bs.modal", (event) => {
@@ -124,10 +130,11 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         </th>
         ${confidenceLevels.map((level) => step.stepIndex === 2 && level.value === "skip"
-          ? '<td><span class="small text-muted">Required for all experts</span></td>'
+          ? '<td><div class="confidence-option-required"><span class="small text-muted">Required for all experts</span></div></td>'
           : `<td><label class="confidence-option">
               <input type="radio" class="form-check-input" name="confianca_${step.groupKey}"
                      value="${level.value}" aria-label="${step.navTitle}: ${level.label}" required>
+              <span class="confidence-level-label">${level.label}</span>
             </label></td>`).join("")}
       </tr>
     `).join("");
@@ -144,6 +151,9 @@ document.addEventListener("DOMContentLoaded", function () {
         topicConfidence[step.groupKey] = body.querySelector(`input[name="confianca_${step.groupKey}"]:checked`)?.value || "";
       });
       applyTopicPreferences();
+      for (let s = 2; s <= 7; s++) {
+        updatePairStepView(s);
+      }
       updateAllProgress();
       updateReviewSummary();
       saveProgressToLocalStorage();
@@ -332,18 +342,48 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Renders cards for a specific step in matrix format
+   * Renders cards for a specific step in matrix format with 12axes-inspired step mode support
    */
   function renderMatrixCards(pairs, container, step) {
-    let html = "";
+    const stepIndex = step.stepIndex;
+    container.classList.add("mode-step");
 
-    pairs.forEach((pair) => {
+    let html = `
+      <!-- 12axes-Inspired Mobile Step Mode Toolbar -->
+      <div class="pair-step-ctrl" id="pairCtrl_${stepIndex}">
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary pair-num-pill" id="pairCurrentBadge_${stepIndex}">Pair 1 of ${pairs.length}</span>
+            <span class="small text-muted pair-answered-ratio" id="pairRatio_${stepIndex}">0 of ${pairs.length} answered</span>
+          </div>
+          <div class="btn-group btn-group-sm pair-mode-toggle" role="group" aria-label="Viewing mode">
+            <button type="button" class="btn btn-outline-primary btn-sm btn-mode-single active" data-step="${stepIndex}" data-mode="step" title="12axes step mode: focus on 1 comparison at a time">
+              <i class="bi bi-card-text me-1"></i> Step Mode
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm btn-mode-all" data-step="${stepIndex}" data-mode="all" title="Show all comparisons in a list">
+              <i class="bi bi-view-list me-1"></i> View All (${pairs.length})
+            </button>
+          </div>
+        </div>
+        <!-- Mini Step Indicator Dots -->
+        <div class="pair-dots-track mb-3" id="pairDots_${stepIndex}">
+          ${pairs.map((p, i) => `
+            <button type="button" class="pair-dot-btn ${i === 0 ? 'is-current' : ''}" data-step="${stepIndex}" data-index="${i}" title="Pair ${i + 1}: ${p.crit1.code} vs ${p.crit2.code}">
+              <span class="dot-num">${i + 1}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+
+    pairs.forEach((pair, pIdx) => {
       const { index, crit1, crit2, pairKey } = pair;
       const themeCode1 = (crit1.parentCode || crit1.code).toLowerCase();
       const themeCode2 = (crit2.parentCode || crit2.code).toLowerCase();
+      const isFirst = pIdx === 0;
 
       html += `
-        <div class="criteria-card-item" id="card_${pairKey}" data-pair="${pairKey}">
+        <div class="criteria-card-item ${isFirst ? 'is-active-card' : ''}" id="card_${pairKey}" data-pair="${pairKey}" data-pair-index="${pIdx}">
           <!-- Compact Card Header -->
           <div class="criteria-card-header">
             <span class="card-pair-badge">
@@ -425,7 +465,206 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     });
 
+    html += `
+      <!-- Pair Step Navigation Bar (12axes style) -->
+      <div class="pair-step-nav-bar d-flex justify-content-between align-items-center gap-2 mt-3" id="pairNavFooter_${stepIndex}">
+        <button type="button" class="btn btn-outline-secondary px-3 py-2 btn-pair-step-prev" data-step="${stepIndex}">
+          <i class="bi bi-arrow-left me-1"></i> Previous Pair
+        </button>
+        <span class="small fw-semibold text-secondary pair-quick-info d-none d-sm-inline" id="pairQuickInfo_${stepIndex}">
+          Pair 1 of ${pairs.length}
+        </span>
+        <button type="button" class="btn btn-primary px-3 py-2 btn-pair-step-next" data-step="${stepIndex}">
+          Next Pair <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+      </div>
+    `;
+
     container.innerHTML = html;
+  }
+
+  /**
+   * Updates display state of 12axes-inspired pair step mode
+   */
+  function updatePairStepView(stepIndex) {
+    const container = document.getElementById(`matrixContainer_step_${stepIndex}`);
+    if (!container) return;
+
+    const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === stepIndex);
+    if (!stepDef || !Array.isArray(stepDef.pairs)) return;
+
+    const totalPairs = stepDef.pairs.length;
+    let activeIdx = stepActivePairIndex[stepIndex] || 0;
+    if (activeIdx < 0) activeIdx = 0;
+    if (activeIdx >= totalPairs) activeIdx = totalPairs - 1;
+    stepActivePairIndex[stepIndex] = activeIdx;
+
+    const mode = stepViewMode[stepIndex] || "step";
+    container.classList.toggle("mode-step", mode === "step");
+
+    // Update active class on cards
+    stepDef.pairs.forEach((pair, idx) => {
+      const card = document.getElementById(`card_${pair.pairKey}`);
+      if (card) {
+        card.classList.toggle("is-active-card", idx === activeIdx);
+      }
+    });
+
+    // Update counter badge
+    const badge = document.getElementById(`pairCurrentBadge_${stepIndex}`);
+    if (badge) {
+      badge.textContent = `Pair ${activeIdx + 1} of ${totalPairs}`;
+    }
+
+    const answeredCount = stepDef.pairs.filter((pair) => {
+      const radio = document.querySelector(`input[name="mais_importante_${pair.pairKey}"]:checked`);
+      const sel = document.getElementById(`select_intensidade_${pair.pairKey}`);
+      return radio && sel && sel.value;
+    }).length;
+
+    const ratio = document.getElementById(`pairRatio_${stepIndex}`);
+    if (ratio) {
+      ratio.textContent = `${answeredCount} of ${totalPairs} answered`;
+    }
+
+    // Update dots
+    const dotsTrack = document.getElementById(`pairDots_${stepIndex}`);
+    if (dotsTrack) {
+      const dotButtons = dotsTrack.querySelectorAll(".pair-dot-btn");
+      dotButtons.forEach((btn, idx) => {
+        const pair = stepDef.pairs[idx];
+        const radio = document.querySelector(`input[name="mais_importante_${pair.pairKey}"]:checked`);
+        const sel = document.getElementById(`select_intensidade_${pair.pairKey}`);
+        const isDone = Boolean(radio && sel && sel.value);
+
+        btn.classList.toggle("is-current", idx === activeIdx);
+        btn.classList.toggle("is-answered", isDone);
+      });
+    }
+
+    // Update mode buttons active state
+    const singleBtn = container.querySelector(".btn-mode-single");
+    const allBtn = container.querySelector(".btn-mode-all");
+    if (singleBtn) singleBtn.classList.toggle("active", mode === "step");
+    if (allBtn) allBtn.classList.toggle("active", mode === "all");
+
+    // In step mode, hide duplicate bottom step-nav-footer so only pair-step-nav-bar is shown
+    const stepNavFooter = document.querySelector(`#stepView_${stepIndex} .step-nav-footer`);
+    if (stepNavFooter) {
+      stepNavFooter.classList.toggle("d-none", mode === "step");
+    }
+
+    // Update pair navigation buttons
+    const prevBtn = container.querySelector(".btn-pair-step-prev");
+    const nextBtn = container.querySelector(".btn-pair-step-next");
+    const quickInfo = document.getElementById(`pairQuickInfo_${stepIndex}`);
+
+    if (quickInfo) {
+      quickInfo.textContent = `Pair ${activeIdx + 1} of ${totalPairs}`;
+    }
+
+    if (prevBtn) {
+      if (activeIdx === 0) {
+        prevBtn.innerHTML = `<i class="bi bi-arrow-left me-1"></i> Prev Step`;
+      } else {
+        prevBtn.innerHTML = `<i class="bi bi-arrow-left me-1"></i> Previous`;
+      }
+    }
+
+    if (nextBtn) {
+      if (activeIdx === totalPairs - 1) {
+        nextBtn.innerHTML = `Next Step <i class="bi bi-arrow-right ms-1"></i>`;
+      } else {
+        nextBtn.innerHTML = `Next <i class="bi bi-arrow-right ms-1"></i>`;
+      }
+    }
+  }
+
+  /**
+   * Sets up event listeners for 12axes-inspired pair step mode controls
+   */
+  function setupPairStepControls() {
+    SURVEY_STEPS.forEach((step) => {
+      if (step.type !== "comparisons" || !Array.isArray(step.pairs)) return;
+
+      const stepIndex = step.stepIndex;
+      const container = document.getElementById(`matrixContainer_step_${stepIndex}`);
+      if (!container) return;
+
+      // Prev Pair button
+      const prevBtn = container.querySelector(".btn-pair-step-prev");
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          if (stepActivePairIndex[stepIndex] > 0) {
+            stepActivePairIndex[stepIndex]--;
+            updatePairStepView(stepIndex);
+            scrollActiveCardIntoView(stepIndex);
+          } else {
+            const prevStepBtn = document.querySelector(`#stepView_${stepIndex} .btn-step-prev`);
+            if (prevStepBtn) prevStepBtn.click();
+          }
+        });
+      }
+
+      // Next Pair button
+      const nextBtn = container.querySelector(".btn-pair-step-next");
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          if (stepActivePairIndex[stepIndex] < step.pairs.length - 1) {
+            stepActivePairIndex[stepIndex]++;
+            updatePairStepView(stepIndex);
+            scrollActiveCardIntoView(stepIndex);
+          } else {
+            const nextStepBtn = document.querySelector(`#stepView_${stepIndex} .btn-step-next`);
+            if (nextStepBtn) nextStepBtn.click();
+          }
+        });
+      }
+
+      // Dots click
+      const dotsTrack = document.getElementById(`pairDots_${stepIndex}`);
+      if (dotsTrack) {
+        dotsTrack.querySelectorAll(".pair-dot-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const targetIdx = parseInt(this.getAttribute("data-index"), 10);
+            if (!isNaN(targetIdx)) {
+              stepActivePairIndex[stepIndex] = targetIdx;
+              updatePairStepView(stepIndex);
+              scrollActiveCardIntoView(stepIndex);
+            }
+          });
+        });
+      }
+
+      // View mode toggle
+      const modeButtons = container.querySelectorAll(".pair-mode-toggle button");
+      modeButtons.forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const mode = this.getAttribute("data-mode");
+          stepViewMode[stepIndex] = mode;
+
+          modeButtons.forEach((b) => b.classList.toggle("active", b === this));
+          container.classList.toggle("mode-step", mode === "step");
+          updatePairStepView(stepIndex);
+        });
+      });
+    });
+  }
+
+  function scrollActiveCardIntoView(stepIndex) {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    const card = document.querySelector(`#matrixContainer_step_${stepIndex} .is-active-card`);
+    const stickyBar = document.querySelector(".sticky-progress-bar");
+    const stickyHeight = stickyBar ? stickyBar.offsetHeight : 50;
+
+    if (card && typeof card.getBoundingClientRect === "function") {
+      const rect = card.getBoundingClientRect();
+      // Only scroll if card is out of view or occluded by sticky bar
+      if (rect.top < stickyHeight || rect.bottom > (window.innerHeight || 800)) {
+        const targetY = (window.pageYOffset || document.documentElement.scrollTop || 0) + rect.top - stickyHeight - 10;
+        window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+      }
+    }
   }
 
   /**
@@ -466,7 +705,25 @@ document.addEventListener("DOMContentLoaded", function () {
           checkSinglePairCompletion(pairKey, card, statusBadge, select);
           updateAllProgress();
           updateStepCompletionText(pair.stepIndex);
+          updatePairStepView(pair.stepIndex);
           saveProgressToLocalStorage();
+
+          // 12axes-inspired auto-advance if degree was already chosen
+          if (select && select.value && stepViewMode[pair.stepIndex] === "step") {
+            const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === pair.stepIndex);
+            if (stepDef && Array.isArray(stepDef.pairs)) {
+              const currentIdx = stepActivePairIndex[pair.stepIndex];
+              if (currentIdx < stepDef.pairs.length - 1) {
+                setTimeout(() => {
+                  if (currentStep === pair.stepIndex && stepViewMode[pair.stepIndex] === "step") {
+                    stepActivePairIndex[pair.stepIndex] = currentIdx + 1;
+                    updatePairStepView(pair.stepIndex);
+                    scrollActiveCardIntoView(pair.stepIndex);
+                  }
+                }, 380);
+              }
+            }
+          }
         });
       });
 
@@ -475,7 +732,26 @@ document.addEventListener("DOMContentLoaded", function () {
           checkSinglePairCompletion(pairKey, card, statusBadge, select);
           updateAllProgress();
           updateStepCompletionText(pair.stepIndex);
+          updatePairStepView(pair.stepIndex);
           saveProgressToLocalStorage();
+
+          // 12axes-inspired auto-advance in step mode if pair is fully completed
+          const radioChecked = document.querySelector(`input[name="mais_importante_${pairKey}"]:checked`);
+          if (radioChecked && select.value && stepViewMode[pair.stepIndex] === "step") {
+            const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === pair.stepIndex);
+            if (stepDef && Array.isArray(stepDef.pairs)) {
+              const currentIdx = stepActivePairIndex[pair.stepIndex];
+              if (currentIdx < stepDef.pairs.length - 1) {
+                setTimeout(() => {
+                  if (currentStep === pair.stepIndex && stepViewMode[pair.stepIndex] === "step") {
+                    stepActivePairIndex[pair.stepIndex] = currentIdx + 1;
+                    updatePairStepView(pair.stepIndex);
+                    scrollActiveCardIntoView(pair.stepIndex);
+                  }
+                }, 380);
+              }
+            }
+          }
         });
       }
     });
@@ -739,7 +1015,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     currentStep = targetStep;
+    if (typeof document !== "undefined" && document.body) {
+      document.body.classList.toggle("in-evaluation-mode", targetStep >= 2 && targetStep <= 7);
+    }
     if (!preserveAlert) clearAlert();
+
+    // If entering a comparison step, focus on first unanswered pair and update view
+    if (targetStep >= 2 && targetStep <= 7) {
+      const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === targetStep);
+      if (stepDef && Array.isArray(stepDef.pairs)) {
+        const firstUnanswered = stepDef.pairs.findIndex((pair) => {
+          const r = document.querySelector(`input[name="mais_importante_${pair.pairKey}"]:checked`);
+          const s = document.getElementById(`select_intensidade_${pair.pairKey}`);
+          return !r || !s || !s.value;
+        });
+        if (firstUnanswered !== -1) {
+          stepActivePairIndex[targetStep] = firstUnanswered;
+        }
+        updatePairStepView(targetStep);
+      }
+    }
 
     // Update horizontal Stepper visual
     updateStepperVisual();
@@ -811,6 +1106,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (currentStepName && currentStepDef) {
       currentStepName.textContent = currentStepDef.title;
+    }
+
+    // Auto-scroll the active stepper pill into view horizontally on mobile
+    const activePill = document.getElementById(`stepperPill_${currentStep}`);
+    if (activePill && typeof activePill.scrollIntoView === "function") {
+      activePill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
   }
 
@@ -1074,6 +1375,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       applyTopicPreferences();
+      for (let s = 2; s <= 7; s++) {
+        updatePairStepView(s);
+      }
 
       // Existing drafts without the new required fields must revisit Step 1.
       const hasProfile = document.getElementById("evaluatorName")?.value.trim() &&

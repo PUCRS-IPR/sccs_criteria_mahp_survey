@@ -1706,11 +1706,19 @@ a {
     cursor: pointer;
   }
 
-  #mobileStepSelect:hover,
-  #mobileStepSelect:focus {
+  #mobileStepSelect:enabled:hover,
+  #mobileStepSelect:enabled:focus {
     border-color: var(--primary-hover);
     background-color: #dae6f2;
     box-shadow: 0 0 0 3px rgba(35, 101, 142, 0.2);
+  }
+
+  #mobileStepSelect:disabled {
+    border-color: #cbd5e1;
+    background-color: #f1f5f9;
+    color: #64748b;
+    box-shadow: none;
+    cursor: not-allowed;
   }
 
   .step-container {
@@ -1849,10 +1857,6 @@ a {
   .radio-pill {
     font-size: 0.9375rem;
     padding-block: 0.75rem;
-  }
-
-  .radio-text-label {
-    align-items: flex-start;
   }
 
   .intensity-block {

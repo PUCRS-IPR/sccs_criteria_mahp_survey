@@ -174,7 +174,10 @@
         <label class="mobile-step-label" for="mobileStepSelect">
           <i class="bi bi-signpost-split-fill me-1" aria-hidden="true"></i> Choose a step or criteria group
         </label>
-        <select class="form-select" id="mobileStepSelect"></select>
+        <select class="form-select" id="mobileStepSelect" aria-describedby="mobileStepSelectHelp" disabled></select>
+        <p class="form-text mt-2 mb-0" id="mobileStepSelectHelp" role="status">
+          <i class="bi bi-lock-fill me-1" aria-hidden="true"></i> Complete all required fields and topic choices in Step 1 to enable step selection.
+        </p>
       </div>
     </div>
 

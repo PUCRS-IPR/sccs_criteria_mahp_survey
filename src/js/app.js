@@ -1079,6 +1079,12 @@ document.addEventListener("DOMContentLoaded", function () {
    * Updates active/completed classes on Stepper buttons
    */
   function updateStepperVisual() {
+    const nameVal = document.getElementById("evaluatorName")?.value.trim();
+    const emailVal = document.getElementById("evaluatorEmail")?.value.trim();
+    const educationVal = document.getElementById("evaluatorEducation")?.value.trim();
+    const isProfileComplete = Boolean(nameVal && emailVal && validateEmailFormat(emailVal) && educationVal &&
+      comparisonSteps.every((item) => getConfidence(item)));
+
     SURVEY_STEPS.forEach((step) => {
       const pill = document.getElementById(`stepperPill_${step.stepIndex}`);
       const checkEl = document.getElementById(`stepperCheck_${step.stepIndex}`);
@@ -1088,11 +1094,7 @@ document.addEventListener("DOMContentLoaded", function () {
       let isCompleted = false;
 
       if (step.stepIndex === 1) {
-        const nameVal = document.getElementById("evaluatorName")?.value.trim();
-        const emailVal = document.getElementById("evaluatorEmail")?.value.trim();
-        const educationVal = document.getElementById("evaluatorEducation")?.value.trim();
-        isCompleted = Boolean(nameVal && emailVal && validateEmailFormat(emailVal) && educationVal &&
-          comparisonSteps.every((item) => getConfidence(item)));
+        isCompleted = isProfileComplete;
       } else if (step.type === "comparisons" && Array.isArray(step.pairs)) {
         const answeredInStep = step.pairs.filter((pair) => {
           const radio = document.querySelector(`input[name="mais_importante_${pair.pairKey}"]:checked`);
@@ -1131,7 +1133,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentStepName && currentStepDef) {
       currentStepName.textContent = currentStepDef.title;
     }
-    if (mobileStepSelect) mobileStepSelect.value = String(currentStep);
+    if (mobileStepSelect) {
+      mobileStepSelect.value = String(currentStep);
+      mobileStepSelect.disabled = !isProfileComplete;
+      if (isProfileComplete) {
+        mobileStepSelect.removeAttribute("aria-describedby");
+      } else {
+        mobileStepSelect.setAttribute("aria-describedby", "mobileStepSelectHelp");
+      }
+    }
+    const mobileStepSelectHelp = document.getElementById("mobileStepSelectHelp");
+    if (mobileStepSelectHelp) mobileStepSelectHelp.hidden = isProfileComplete;
 
     // Auto-scroll the active stepper pill into view horizontally on mobile
     const activePill = document.getElementById(`stepperPill_${currentStep}`);

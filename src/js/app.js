@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const topicConfidence = {};
   const stepActivePairIndex = { 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
   const stepViewMode = { 2: "step", 3: "step", 4: "step", 5: "step", 6: "step", 7: "step" };
+  const desktopComparisonLayout = window.matchMedia?.("(min-width: 768px)");
   const confidenceLevels = [
     { value: "skip", label: "I do not want to answer" },
     { value: "very_low", label: "Very low confidence" },
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Global DOM elements
   const form = document.getElementById("ahpForm");
   const stepperTrack = document.getElementById("stepperTrack");
+  const mobileStepSelect = document.getElementById("mobileStepSelect");
   const progressBar = document.getElementById("ahpProgressBar");
   const progressText = document.getElementById("ahpProgressText");
   const currentStepBadge = document.getElementById("currentStepBadge");
@@ -42,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // 2. Render comparison matrices for steps 2 to 8
   renderAllComparisonMatrices();
   setupPairStepControls();
+  desktopComparisonLayout?.addEventListener("change", () => {
+    comparisonSteps.forEach((step) => updatePairStepView(step.stepIndex));
+  });
   for (let s = 2; s <= 7; s++) {
     updatePairStepView(s);
   }
@@ -220,6 +225,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     stepperTrack.innerHTML = html;
+    if (mobileStepSelect) {
+      mobileStepSelect.innerHTML = SURVEY_STEPS.map((step) =>
+        `<option value="${step.stepIndex}">${step.stepIndex}. ${step.navTitle}</option>`
+      ).join("");
+      mobileStepSelect.addEventListener("change", () => {
+        document.getElementById(`stepperPill_${mobileStepSelect.value}`)?.click();
+        mobileStepSelect.value = String(currentStep);
+      });
+    }
 
     // Navigation listener when clicking stepper buttons
     const pills = stepperTrack.querySelectorAll(".stepper-nav-btn");
@@ -415,7 +429,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="radio-indicator-dot"></span>
                     <div class="radio-text-label">
                       <span class="badge badge-criteria-${themeCode1}">${crit1.code}</span>
-                      <span class="text-truncate">${crit1.name}</span>
+                      <span class="criterion-option-name">${crit1.name}</span>
                     </div>
                   </div>
                 </label>
@@ -437,7 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="radio-indicator-dot"></span>
                     <div class="radio-text-label">
                       <span class="badge badge-criteria-${themeCode2}">${crit2.code}</span>
-                      <span class="text-truncate">${crit2.name}</span>
+                      <span class="criterion-option-name">${crit2.name}</span>
                     </div>
                   </div>
                 </label>
@@ -448,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             <!-- Question 2: Intensity (Saaty Verbal Scale) -->
             <div class="intensity-block is-disabled" id="intensity_block_${pairKey}">
-              <label class="dynamic-question-label" id="label_intensidade_${pairKey}">
+              <label class="dynamic-question-label" id="label_intensidade_${pairKey}" for="select_intensidade_${pairKey}">
                 <i class="bi bi-lock-fill me-1 text-muted"></i> 2. Degree of superiority:
               </label>
               <select class="form-select form-select-sm saaty-select" 
@@ -486,6 +500,10 @@ document.addEventListener("DOMContentLoaded", function () {
   /**
    * Updates display state of 12axes-inspired pair step mode
    */
+  function getPairViewMode(stepIndex) {
+    return desktopComparisonLayout?.matches ? "all" : (stepViewMode[stepIndex] || "step");
+  }
+
   function updatePairStepView(stepIndex) {
     const container = document.getElementById(`matrixContainer_step_${stepIndex}`);
     if (!container) return;
@@ -499,7 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (activeIdx >= totalPairs) activeIdx = totalPairs - 1;
     stepActivePairIndex[stepIndex] = activeIdx;
 
-    const mode = stepViewMode[stepIndex] || "step";
+    const mode = getPairViewMode(stepIndex);
     container.classList.toggle("mode-step", mode === "step");
 
     // Update active class on cards
@@ -539,6 +557,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         btn.classList.toggle("is-current", idx === activeIdx);
         btn.classList.toggle("is-answered", isDone);
+        btn.setAttribute("aria-current", idx === activeIdx ? "step" : "false");
       });
     }
 
@@ -547,6 +566,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const allBtn = container.querySelector(".btn-mode-all");
     if (singleBtn) singleBtn.classList.toggle("active", mode === "step");
     if (allBtn) allBtn.classList.toggle("active", mode === "all");
+    singleBtn?.setAttribute("aria-pressed", String(mode === "step"));
+    allBtn?.setAttribute("aria-pressed", String(mode === "all"));
 
     // In step mode, hide duplicate bottom step-nav-footer so only pair-step-nav-bar is shown
     const stepNavFooter = document.querySelector(`#stepView_${stepIndex} .step-nav-footer`);
@@ -709,13 +730,13 @@ document.addEventListener("DOMContentLoaded", function () {
           saveProgressToLocalStorage();
 
           // 12axes-inspired auto-advance if degree was already chosen
-          if (select && select.value && stepViewMode[pair.stepIndex] === "step") {
+          if (select && select.value && getPairViewMode(pair.stepIndex) === "step") {
             const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === pair.stepIndex);
             if (stepDef && Array.isArray(stepDef.pairs)) {
               const currentIdx = stepActivePairIndex[pair.stepIndex];
               if (currentIdx < stepDef.pairs.length - 1) {
                 setTimeout(() => {
-                  if (currentStep === pair.stepIndex && stepViewMode[pair.stepIndex] === "step") {
+                  if (currentStep === pair.stepIndex && getPairViewMode(pair.stepIndex) === "step") {
                     stepActivePairIndex[pair.stepIndex] = currentIdx + 1;
                     updatePairStepView(pair.stepIndex);
                     scrollActiveCardIntoView(pair.stepIndex);
@@ -737,13 +758,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // 12axes-inspired auto-advance in step mode if pair is fully completed
           const radioChecked = document.querySelector(`input[name="mais_importante_${pairKey}"]:checked`);
-          if (radioChecked && select.value && stepViewMode[pair.stepIndex] === "step") {
+          if (radioChecked && select.value && getPairViewMode(pair.stepIndex) === "step") {
             const stepDef = SURVEY_STEPS.find((s) => s.stepIndex === pair.stepIndex);
             if (stepDef && Array.isArray(stepDef.pairs)) {
               const currentIdx = stepActivePairIndex[pair.stepIndex];
               if (currentIdx < stepDef.pairs.length - 1) {
                 setTimeout(() => {
-                  if (currentStep === pair.stepIndex && stepViewMode[pair.stepIndex] === "step") {
+                  if (currentStep === pair.stepIndex && getPairViewMode(pair.stepIndex) === "step") {
                     stepActivePairIndex[pair.stepIndex] = currentIdx + 1;
                     updatePairStepView(pair.stepIndex);
                     scrollActiveCardIntoView(pair.stepIndex);
@@ -1082,7 +1103,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       pill.classList.toggle("active", isCurrent);
+      pill.setAttribute("aria-current", isCurrent ? "step" : "false");
       const enabled = isStepEnabled(step.stepIndex);
+      const mobileOption = mobileStepSelect?.querySelector(`option[value="${step.stepIndex}"]`);
+      if (mobileOption) mobileOption.disabled = !enabled;
       pill.disabled = !enabled;
       pill.setAttribute("aria-disabled", String(!enabled));
       pill.title = enabled ? step.title : `${step.title} — Not answering (change in Step 1)`;
@@ -1107,10 +1131,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentStepName && currentStepDef) {
       currentStepName.textContent = currentStepDef.title;
     }
+    if (mobileStepSelect) mobileStepSelect.value = String(currentStep);
 
     // Auto-scroll the active stepper pill into view horizontally on mobile
     const activePill = document.getElementById(`stepperPill_${currentStep}`);
-    if (activePill && typeof activePill.scrollIntoView === "function") {
+    if (activePill && activePill.getClientRects().length && typeof activePill.scrollIntoView === "function") {
       activePill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
   }

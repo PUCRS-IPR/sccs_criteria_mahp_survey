@@ -17,6 +17,12 @@ async function openSurvey(t, saved) {
   t.after(() => dom.window.close());
   const { window } = dom;
   window.HTMLElement.prototype.scrollIntoView = function () {};
+  let desktopLayout;
+  window.matchMedia = () => {
+    desktopLayout = new window.EventTarget();
+    desktopLayout.matches = false;
+    return desktopLayout;
+  };
   window.alert = () => {};
   if (saved) window.localStorage.setItem(storageKey, JSON.stringify(saved));
   await new Promise((resolve) => window.document.addEventListener('DOMContentLoaded', resolve, { once: true }));
@@ -49,8 +55,43 @@ async function openSurvey(t, saved) {
     });
   };
   const active = () => Number(document.querySelector('.step-view.active').dataset.stepIndex);
-  return { window, document, choose, profile, answer, active };
+  const resizeToDesktop = (matches) => {
+    desktopLayout.matches = matches;
+    desktopLayout.dispatchEvent(new window.Event('change'));
+  };
+  return { window, document, choose, profile, answer, active, resizeToDesktop };
 }
+
+test('mobile navigation validates the profile and desktop always displays all comparisons', async (t) => {
+  const { window, document, profile, choose, active, resizeToDesktop } = await openSurvey(t);
+  const navigation = document.getElementById('mobileStepSelect');
+  const navigate = (step) => {
+    navigation.value = String(step);
+    navigation.dispatchEvent(new window.Event('change', { bubbles: true }));
+  };
+  navigate(2);
+  assert.equal(active(), 1);
+  assert.equal(navigation.value, '1');
+  profile();
+  assert.equal(navigation.querySelector('option[value="3"]').disabled, true);
+  choose('A', 'high');
+  assert.equal(navigation.querySelector('option[value="3"]').disabled, false);
+  navigate(3);
+  assert.equal(active(), 3);
+  assert.equal(document.getElementById('stepperPill_3').getAttribute('aria-current'), 'step');
+  const matrix = document.getElementById('matrixContainer_step_3');
+  assert.equal(matrix.classList.contains('mode-step'), true);
+  resizeToDesktop(true);
+  assert.equal(matrix.classList.contains('mode-step'), false);
+  assert.equal(document.querySelector('#stepView_3 .step-nav-footer').classList.contains('d-none'), false);
+  matrix.querySelector('.btn-mode-single').click();
+  assert.equal(matrix.classList.contains('mode-step'), false);
+  resizeToDesktop(false);
+  assert.equal(matrix.classList.contains('mode-step'), true);
+  navigate(8);
+  assert.equal(active(), 8);
+  assert.equal(navigation.value, '8');
+});
 
 test('confidence radios start unchecked and Main Criteria cannot be skipped', async (t) => {
   const { document, profile, choose } = await openSurvey(t);

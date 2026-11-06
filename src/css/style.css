@@ -319,8 +319,8 @@ a {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 44px;
+  height: 44px;
   padding: 0.4rem;
   border: 1px solid #95b6c9;
   border-radius: 0.4rem;
@@ -833,29 +833,23 @@ a {
 /* Marcadores circulares numerados para navegação direta entre os pares */
 .pair-dots-track {
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  overflow: visible;
   gap: 0.3rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 0.35rem 0.5rem;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 2rem;
+  border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
-.pair-dots-track::-webkit-scrollbar {
-  display: none;
-}
-
 .pair-dot-btn {
-  flex: 0 0 26px;
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   padding: 0;
   border-radius: 50%;
   display: inline-flex;
@@ -1033,7 +1027,8 @@ a {
 }
 
 .pair-option-row .radio-pill {
-  padding-right: 2.75rem;
+  min-height: 60px;
+  padding-right: 3.5rem;
 }
 
 .criterion-help-trigger {
@@ -1045,8 +1040,8 @@ a {
   background: #ffffff;
   color: var(--primary-accent);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1547,13 +1542,6 @@ a {
   outline-offset: 3px;
 }
 
-.pair-dots-track {
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  overflow: visible;
-  border-radius: 0.75rem;
-}
-
 .comparison-matrix:not(.mode-step) .pair-dots-track {
   display: none;
 }
@@ -1563,19 +1551,6 @@ a {
   .pair-num-pill {
     display: none;
   }
-}
-
-.pair-dot-btn,
-.topic-tree-trigger,
-.criterion-help-trigger {
-  min-width: 44px;
-  width: 44px;
-  height: 44px;
-}
-
-.pair-option-row .radio-pill {
-  min-height: 60px;
-  padding-right: 3.5rem;
 }
 
 .pair-mode-toggle .btn,
